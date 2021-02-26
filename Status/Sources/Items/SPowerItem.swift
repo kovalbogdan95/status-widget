@@ -14,6 +14,26 @@ struct SPowerStatus {
 	var isCharging: Bool, isCharged: Bool, currentValue: Int
 }
 
+class Helper {
+    static func shell(launchPath path: String, arguments args: [String]) -> String {
+        let task = Process()
+        task.launchPath = path
+        task.arguments = args
+
+        let pipe = Pipe()
+        task.standardOutput = pipe
+        task.standardError = pipe
+        task.launch()
+
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        let output = String(data: data, encoding: .utf8)
+        task.waitUntilExit()
+
+        return(output!)
+    }
+}
+
+
 internal class SPowerItem: StatusItem {
     
     /// Core
@@ -122,7 +142,8 @@ internal class SPowerItem: StatusItem {
             iconView.image    = nil
             iconView.subviews.forEach({ $0.removeFromSuperview() })
         }
-        valueLabel.stringValue = shouldShowBatteryPercentage ? "\(value)%" : ""
+        let temp = Helper.shell(launchPath: "/usr/local/bin/cpu-temp", arguments: []).trimmingCharacters(in: .whitespacesAndNewlines)
+        valueLabel.stringValue = shouldShowBatteryPercentage ? "\(temp) \(value)%" : ""
         valueLabel.isHidden    = !shouldShowBatteryPercentage
     }
     
