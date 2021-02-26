@@ -51,6 +51,8 @@ internal class SPowerItem: StatusItem {
     private let iconView: NSImageView = NSImageView(frame: NSRect(x: 0, y: 0, width: 26, height: 26))
     private let bodyView: NSView      = NSView(frame: NSRect(x: 2, y: 2, width: 21, height: 8))
     private let valueLabel: NSTextField = NSTextField(frame: .zero)
+    private let tempLabel: NSTextField = NSTextField(frame: NSRect(x: 2, y: 2, width: 40, height: 8))
+
     
     init() {
         didLoad()
@@ -64,6 +66,7 @@ internal class SPowerItem: StatusItem {
     func didLoad() {
         bodyView.layer?.cornerRadius = 1
         configureValueLabel()
+        configureTempLabel()
         configureStackView()
         refreshTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: { [weak self] _ in
             self?.reload()
@@ -90,14 +93,22 @@ internal class SPowerItem: StatusItem {
         valueLabel.backgroundColor = .clear
         valueLabel.isBezeled = false
         valueLabel.isEditable = false
-        valueLabel.sizeToFit()
+        // valueLabel.sizeToFit()
     }
-    
+    private func configureTempLabel() {
+        tempLabel.font = NSFont.systemFont(ofSize: 13)
+        tempLabel.backgroundColor = .clear
+        tempLabel.isBezeled = false
+        tempLabel.isEditable = false
+        // valueLabel.sizeToFit()
+    }
+
     private func configureStackView() {
         stackView.orientation = .horizontal
         stackView.alignment = .centerY
         stackView.distribution = .fillProportionally
         stackView.spacing = 2
+        stackView.addArrangedSubview(tempLabel)
         stackView.addArrangedSubview(valueLabel)
         stackView.addArrangedSubview(iconView)
     }
@@ -143,7 +154,10 @@ internal class SPowerItem: StatusItem {
             iconView.subviews.forEach({ $0.removeFromSuperview() })
         }
         let temp = Helper.shell(launchPath: "/usr/local/bin/cpu-temp", arguments: []).trimmingCharacters(in: .whitespacesAndNewlines)
-        valueLabel.stringValue = shouldShowBatteryPercentage ? "\(temp) \(value)%" : ""
+        tempLabel.stringValue = "\(temp)\t"
+        tempLabel.isHidden = false
+
+        valueLabel.stringValue = shouldShowBatteryPercentage ? "\(value)%" : ""
         valueLabel.isHidden    = !shouldShowBatteryPercentage
     }
     
