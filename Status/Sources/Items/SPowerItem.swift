@@ -153,7 +153,8 @@ internal class SPowerItem: StatusItem {
             iconView.image    = nil
             iconView.subviews.forEach({ $0.removeFromSuperview() })
         }
-        let temp = Helper.shell(launchPath: "/usr/local/bin/cpu-temp", arguments: []).trimmingCharacters(in: .whitespacesAndNewlines)
+        // https://stackoverflow.com/questions/48376150/how-do-i-run-shell-command-in-swift
+        let temp = Helper.shell(launchPath: "/bin/cat", arguments: ["/Users/kovalbogdan95/.cpu_temp"]).trimmingCharacters(in: .whitespacesAndNewlines)
         tempLabel.stringValue = "\(temp)\t"
         tempLabel.isHidden = false
 
